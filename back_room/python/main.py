@@ -24,14 +24,26 @@ table_movimentacao, table_localidade, table_trabalhador, table_periodo, table_em
 #                               Executar ETL                             #
 ##########################################################################
 while True:
+
+    ##########################################################################
+    #                             Extrair dados                              #
+    ##########################################################################
     # Verificar próximo ano e mês a baixar dados
     proximo_ano, proximo_mes = update_date(client,credentials,dataset_fonte,table_periodo)
     # Baixar arquivos
     download_files(proximo_ano,proximo_mes,data_folder)
+
+    ##########################################################################
+    #                         Executar transformações                        #
+    ##########################################################################
     # Ler todos os arquivos, tratar e agrupar em um único dataframe
     df_group = group_files(data_folder)
     # Criar dfs da fato e das dimensões
     df_movimentacao, df_localidade, df_trabalhador, df_periodo, df_empregador, df_fato_caged = create_dfs(df_group)
+
+    ##########################################################################
+    #                          Carregar dados no GCP                         #
+    ##########################################################################
     # Incluir tabelas e dfs em uma biblioteca
     tables_dfs = {
         table_movimentacao:df_movimentacao,
