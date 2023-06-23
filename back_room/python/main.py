@@ -8,7 +8,7 @@ import time
 ##########################################################################
 #                            Definir variáveis                           #
 ##########################################################################
-file_key = "keys\dw-caged-e843b4e16870.json"
+file_key = "keys\dw-ufsc-390713-8946216796dd.json"
 dataset_name = "caged"
 data_folder = "dados"
 # Registrar o tempo no início da execução

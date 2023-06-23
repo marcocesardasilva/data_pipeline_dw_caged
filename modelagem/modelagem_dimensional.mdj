@@ -38,7 +38,7 @@
 									"font": "Arial;13;1",
 									"left": 376,
 									"top": 237,
-									"width": 261.8798828125,
+									"width": 284.73779296875,
 									"height": 13,
 									"text": "FATO_CAGED"
 								},
@@ -64,7 +64,7 @@
 											"font": "Arial;13;0",
 											"left": 381,
 											"top": 260,
-											"width": 251.8798828125,
+											"width": 274.73779296875,
 											"height": 13
 										},
 										{
@@ -79,7 +79,7 @@
 											"font": "Arial;13;0",
 											"left": 381,
 											"top": 275,
-											"width": 251.8798828125,
+											"width": 274.73779296875,
 											"height": 13
 										},
 										{
@@ -94,7 +94,7 @@
 											"font": "Arial;13;0",
 											"left": 381,
 											"top": 290,
-											"width": 251.8798828125,
+											"width": 274.73779296875,
 											"height": 13
 										},
 										{
@@ -109,7 +109,7 @@
 											"font": "Arial;13;0",
 											"left": 381,
 											"top": 305,
-											"width": 251.8798828125,
+											"width": 274.73779296875,
 											"height": 13
 										},
 										{
@@ -124,7 +124,7 @@
 											"font": "Arial;13;0",
 											"left": 381,
 											"top": 320,
-											"width": 251.8798828125,
+											"width": 274.73779296875,
 											"height": 13
 										},
 										{
@@ -139,7 +139,7 @@
 											"font": "Arial;13;0",
 											"left": 381,
 											"top": 335,
-											"width": 251.8798828125,
+											"width": 274.73779296875,
 											"height": 13
 										},
 										{
@@ -154,7 +154,7 @@
 											"font": "Arial;13;0",
 											"left": 381,
 											"top": 350,
-											"width": 251.8798828125,
+											"width": 274.73779296875,
 											"height": 13
 										},
 										{
@@ -169,21 +169,21 @@
 											"font": "Arial;13;0",
 											"left": 381,
 											"top": 365,
-											"width": 251.8798828125,
+											"width": 274.73779296875,
 											"height": 13
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 376,
 									"top": 255,
-									"width": 261.8798828125,
+									"width": 284.73779296875,
 									"height": 128
 								}
 							],
 							"font": "Arial;13;0",
 							"left": 376,
 							"top": 232,
-							"width": 261.8798828125,
+							"width": 284.73779296875,
 							"height": 153,
 							"nameLabel": {
 								"$ref": "AAAAAAGHctXavCQ3F1A="
@@ -352,9 +352,9 @@
 										"$ref": "AAAAAAGHctaxaCRW5XM="
 									},
 									"font": "Arial;13;1",
-									"left": 424,
+									"left": 408,
 									"top": 61,
-									"width": 175.1962890625,
+									"width": 211.796875,
 									"height": 13,
 									"text": "DIM_PERIODO"
 								},
@@ -378,9 +378,24 @@
 												"$ref": "AAAAAAGHcyfqQSWmbfI="
 											},
 											"font": "Arial;13;0",
-											"left": 429,
+											"left": 413,
 											"top": 84,
-											"width": 165.1962890625,
+											"width": 201.796875,
+											"height": 13
+										},
+										{
+											"_type": "ERDColumnView",
+											"_id": "AAAAAAGI5jVSW1BHmXU=",
+											"_parent": {
+												"$ref": "AAAAAAGHctaxaCRYEK0="
+											},
+											"model": {
+												"$ref": "AAAAAAGI5jVSVFBEZg4="
+											},
+											"font": "Arial;13;0",
+											"left": 413,
+											"top": 99,
+											"width": 201.796875,
 											"height": 13
 										},
 										{
@@ -393,9 +408,9 @@
 												"$ref": "AAAAAAGHcygZqSWukrk="
 											},
 											"font": "Arial;13;0",
-											"left": 429,
-											"top": 99,
-											"width": 165.1962890625,
+											"left": 413,
+											"top": 114,
+											"width": 201.796875,
 											"height": 13
 										},
 										{
@@ -408,24 +423,24 @@
 												"$ref": "AAAAAAGHcyin6SW1UPk="
 											},
 											"font": "Arial;13;0",
-											"left": 429,
-											"top": 114,
-											"width": 165.1962890625,
+											"left": 413,
+											"top": 129,
+											"width": 201.796875,
 											"height": 13
 										}
 									],
 									"font": "Arial;13;0",
-									"left": 424,
+									"left": 408,
 									"top": 79,
-									"width": 175.1962890625,
-									"height": 53
+									"width": 211.796875,
+									"height": 68
 								}
 							],
 							"font": "Arial;13;0",
-							"left": 424,
+							"left": 408,
 							"top": 56,
-							"width": 175.1962890625,
-							"height": 76,
+							"width": 211.796875,
+							"height": 91,
 							"nameLabel": {
 								"$ref": "AAAAAAGHctaxaCRX2JY="
 							},
@@ -452,7 +467,7 @@
 									"font": "Arial;13;1",
 									"left": 664,
 									"top": 61,
-									"width": 247.19775390625,
+									"width": 254.427734375,
 									"height": 13,
 									"text": "DIM_TRABALHADOR"
 								},
@@ -478,7 +493,7 @@
 											"font": "Arial;13;0",
 											"left": 669,
 											"top": 84,
-											"width": 237.19775390625,
+											"width": 244.427734375,
 											"height": 13
 										},
 										{
@@ -493,7 +508,7 @@
 											"font": "Arial;13;0",
 											"left": 669,
 											"top": 99,
-											"width": 237.19775390625,
+											"width": 244.427734375,
 											"height": 13
 										},
 										{
@@ -508,7 +523,7 @@
 											"font": "Arial;13;0",
 											"left": 669,
 											"top": 114,
-											"width": 237.19775390625,
+											"width": 244.427734375,
 											"height": 13
 										},
 										{
@@ -523,7 +538,7 @@
 											"font": "Arial;13;0",
 											"left": 669,
 											"top": 129,
-											"width": 237.19775390625,
+											"width": 244.427734375,
 											"height": 13
 										},
 										{
@@ -538,7 +553,7 @@
 											"font": "Arial;13;0",
 											"left": 669,
 											"top": 144,
-											"width": 237.19775390625,
+											"width": 244.427734375,
 											"height": 13
 										},
 										{
@@ -553,21 +568,21 @@
 											"font": "Arial;13;0",
 											"left": 669,
 											"top": 159,
-											"width": 237.19775390625,
+											"width": 244.427734375,
 											"height": 13
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 664,
 									"top": 79,
-									"width": 247.19775390625,
+									"width": 254.427734375,
 									"height": 98
 								}
 							],
 							"font": "Arial;13;0",
 							"left": 664,
 							"top": 56,
-							"width": 247.19775390625,
+							"width": 254.427734375,
 							"height": 121,
 							"nameLabel": {
 								"$ref": "AAAAAAGHcta9XiRjyy8="
@@ -822,7 +837,7 @@
 										"$ref": "AAAAAAGHcuKiRyUhpZ4="
 									},
 									"font": "Arial;13;0",
-									"left": 662,
+									"left": 685,
 									"top": 304,
 									"height": 13,
 									"alpha": -0.5235987755982988,
@@ -840,7 +855,7 @@
 								"$ref": "AAAAAAGHcta9XiRihi4="
 							},
 							"lineStyle": 2,
-							"points": "776:176;776:296;637:296",
+							"points": "776:176;776:296;660:296",
 							"nameLabel": {
 								"$ref": "AAAAAAGHcuKiRyUiTto="
 							},
@@ -951,7 +966,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 510,
-									"top": 174,
+									"top": 182,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 15,
@@ -968,7 +983,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 511,
-									"top": 150,
+									"top": 165,
 									"height": 13,
 									"alpha": 0.5235987755982988,
 									"distance": 30,
@@ -1002,7 +1017,7 @@
 								"$ref": "AAAAAAGHctaxaCRW5XM="
 							},
 							"lineStyle": 2,
-							"points": "496:131;496:232",
+							"points": "496:146;496:232",
 							"nameLabel": {
 								"$ref": "AAAAAAGHcyjawSXCBxQ="
 							},
@@ -1299,8 +1314,8 @@
 								"$ref": "AAAAAAGHctXauiQ0gfo="
 							},
 							"name": "sk_empregador",
-							"type": "INTEGER",
-							"length": 0,
+							"type": "VARCHAR",
+							"length": "200",
 							"primaryKey": true,
 							"foreignKey": true,
 							"referenceTo": {
@@ -1314,8 +1329,8 @@
 								"$ref": "AAAAAAGHctXauiQ0gfo="
 							},
 							"name": "sk_periodo",
-							"type": "INTEGER",
-							"length": 0,
+							"type": "VARCHAR",
+							"length": "200",
 							"primaryKey": true,
 							"foreignKey": true,
 							"referenceTo": {
@@ -1329,8 +1344,8 @@
 								"$ref": "AAAAAAGHctXauiQ0gfo="
 							},
 							"name": "sk_trabalhador",
-							"type": "INTEGER",
-							"length": 0,
+							"type": "VARCHAR",
+							"length": "200",
 							"primaryKey": true,
 							"foreignKey": true,
 							"referenceTo": {
@@ -1344,8 +1359,8 @@
 								"$ref": "AAAAAAGHctXauiQ0gfo="
 							},
 							"name": "sk_movimentacao",
-							"type": "INTEGER",
-							"length": 0,
+							"type": "VARCHAR",
+							"length": "200",
 							"primaryKey": true,
 							"foreignKey": true,
 							"referenceTo": {
@@ -1444,8 +1459,8 @@
 								"$ref": "AAAAAAGHctajHyRI4m0="
 							},
 							"name": "sk_empregador",
-							"type": "INTEGER",
-							"length": 0,
+							"type": "VARCHAR",
+							"length": "200",
 							"primaryKey": true
 						},
 						{
@@ -1545,9 +1560,19 @@
 								"$ref": "AAAAAAGHctaxaCRUs+M="
 							},
 							"name": "sk_periodo",
-							"type": "INTEGER",
-							"length": 0,
+							"type": "VARCHAR",
+							"length": "8",
 							"primaryKey": true
+						},
+						{
+							"_type": "ERDColumn",
+							"_id": "AAAAAAGI5jVSVFBEZg4=",
+							"_parent": {
+								"$ref": "AAAAAAGHctaxaCRUs+M="
+							},
+							"name": "data_mov",
+							"type": "DATE",
+							"length": 0
 						},
 						{
 							"_type": "ERDColumn",
@@ -1616,8 +1641,8 @@
 								"$ref": "AAAAAAGHcta9XSRg+DY="
 							},
 							"name": "sk_trabalhador",
-							"type": "INTEGER",
-							"length": 0,
+							"type": "VARCHAR",
+							"length": "200",
 							"primaryKey": true
 						},
 						{
@@ -1798,8 +1823,8 @@
 								"$ref": "AAAAAAGHc08tXyYs8HU="
 							},
 							"name": "sk_movimentacao",
-							"type": "INTEGER",
-							"length": 0,
+							"type": "VARCHAR",
+							"length": "200",
 							"primaryKey": true
 						},
 						{

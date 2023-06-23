@@ -12,27 +12,26 @@ CREATE DATABASE caged
         TABLESPACE = pg_default
         CONNECTION LIMIT = -1;
 
-
 ----------------------------------------------------------
 --------------------- CRIAR TABELAS ----------------------
 ----------------------------------------------------------
 
 -- DROPAR TABELAS CASO NECESSÁRIO
 
---DROP TABLE public.fato_caged CASCADE;
---DROP TABLE public.dim_empregador CASCADE;
---DROP TABLE public.dim_periodo CASCADE;
---DROP TABLE public.dim_trabalhador CASCADE;
---DROP TABLE public.dim_localidade CASCADE;
---DROP TABLE public.dim_movimentacao CASCADE;
+-- DROP TABLE public.fato_caged CASCADE;
+-- DROP TABLE public.dim_empregador CASCADE;
+-- DROP TABLE public.dim_periodo CASCADE;
+-- DROP TABLE public.dim_trabalhador CASCADE;
+-- DROP TABLE public.dim_localidade CASCADE;
+-- DROP TABLE public.dim_movimentacao CASCADE;
 
 -- CRIAR TABELAS
 
 CREATE TABLE public.fato_caged (
-    sk_empregador integer NOT NULL,
-    sk_periodo integer NOT NULL,
-    sk_trabalhador integer NOT NULL,
-    sk_movimentacao integer NOT NULL,
+    sk_empregador varchar(200) NOT NULL,
+    sk_periodo varchar(200) NOT NULL,
+    sk_trabalhador varchar(200) NOT NULL,
+    sk_movimentacao varchar(200) NOT NULL,
     sk_localidade integer NOT NULL,
     vl_salario numeric NOT NULL,
     nu_hora_contratual integer NOT NULL,
@@ -42,7 +41,7 @@ CREATE TABLE public.fato_caged (
 
 
 CREATE TABLE public.dim_empregador (
-    sk_empregador integer NOT NULL,
+    sk_empregador varchar(200) NOT NULL,
     is_tp_empregador varchar(20) NOT NULL,
     is_tp_estabelecimento varchar(100) NOT NULL,
     is_secao_econ varchar(100) NOT NULL,
@@ -53,15 +52,16 @@ CREATE TABLE public.dim_empregador (
 
 
 CREATE TABLE public.dim_periodo (
-    sk_periodo integer NOT NULL,
-    nu_ano char(4) NOT NULL,
-    nu_mes char(2) NOT NULL,
+    sk_periodo varchar(8) NOT NULL,
+    data_mov date NOT NULL,
+    nu_ano integer NOT NULL,
+    nu_mes integer NOT NULL,
     PRIMARY KEY (sk_periodo)
 );
 
 
 CREATE TABLE public.dim_trabalhador (
-    sk_trabalhador integer NOT NULL,
+    sk_trabalhador varchar(200) NOT NULL,
     is_grau_instrucao varchar(50) NOT NULL,
     is_genero varchar(20) NOT NULL,
     nu_idade integer NOT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE public.dim_localidade (
 
 
 CREATE TABLE public.dim_movimentacao (
-    sk_movimentacao integer NOT NULL,
+    sk_movimentacao varchar(200) NOT NULL,
     is_tp_movimentacao varchar(200) NOT NULL,
     is_categoria varchar(200) NOT NULL,
     is_cbo_ocupacao varchar(200) NOT NULL,

@@ -179,7 +179,7 @@ def update_date(client,credentials,dataset_fonte,table_periodo):
         # Iterar sobre os resultados
         for row in results:
             if int(row["proximo_mes"]) == 12:
-                proximo_mes == 1
+                proximo_mes = 1
                 proximo_ano = int(row["nu_ano"]) + 1
             else:
                 proximo_mes = int(row["proximo_mes"]) + 1
