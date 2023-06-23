@@ -53,7 +53,7 @@ def table_exist(client,dataset_fonte):
     table_movimentacao = dataset_fonte.table("dim_movimentacao")
 
     schema_movimentacao = [
-        bigquery.SchemaField("sk_movimentacao", "INTEGER", mode="REQUIRED"),
+        bigquery.SchemaField("sk_movimentacao", "STRING", mode="REQUIRED"),
         bigquery.SchemaField("is_tp_movimentacao", "STRING"),
         bigquery.SchemaField("is_categoria", "STRING"),
         bigquery.SchemaField("is_cbo_ocupacao", "STRING"),
@@ -78,7 +78,7 @@ def table_exist(client,dataset_fonte):
     table_trabalhador = dataset_fonte.table("dim_trabalhador")
 
     schema_trabalhador = [
-        bigquery.SchemaField("sk_trabalhador", "INTEGER", mode="REQUIRED"),
+        bigquery.SchemaField("sk_trabalhador", "STRING", mode="REQUIRED"),
         bigquery.SchemaField("is_grau_instrucao", "STRING"),
         bigquery.SchemaField("is_genero", "STRING"),
         bigquery.SchemaField("nu_idade", "INTEGER"),
@@ -90,7 +90,8 @@ def table_exist(client,dataset_fonte):
     table_periodo = dataset_fonte.table("dim_periodo")
 
     schema_periodo = [
-        bigquery.SchemaField("sk_periodo", "INTEGER", mode="REQUIRED"),
+        bigquery.SchemaField("sk_periodo", "STRING", mode="REQUIRED"),
+        bigquery.SchemaField("data_mov", "DATE"),
         bigquery.SchemaField("nu_ano", "INTEGER"),
         bigquery.SchemaField("nu_mes", "INTEGER")
     ]
@@ -99,7 +100,7 @@ def table_exist(client,dataset_fonte):
     table_empregador = dataset_fonte.table("dim_empregador")
 
     schema_empregador = [
-        bigquery.SchemaField("sk_empregador", "INTEGER", mode="REQUIRED"),
+        bigquery.SchemaField("sk_empregador", "STRING", mode="REQUIRED"),
         bigquery.SchemaField("is_tp_empregador", "STRING"),
         bigquery.SchemaField("is_tp_estabelecimento", "STRING"),
         bigquery.SchemaField("is_secao_econ", "STRING"),
@@ -111,10 +112,10 @@ def table_exist(client,dataset_fonte):
     table_fato_caged = dataset_fonte.table("fato_caged")
 
     schema_fato_caged = [
-        bigquery.SchemaField("sk_empregador", "INTEGER", mode="REQUIRED"),
-        bigquery.SchemaField("sk_periodo", "INTEGER", mode="REQUIRED"),
-        bigquery.SchemaField("sk_trabalhador", "INTEGER", mode="REQUIRED"),
-        bigquery.SchemaField("sk_movimentacao", "INTEGER", mode="REQUIRED"),
+        bigquery.SchemaField("sk_empregador", "STRING", mode="REQUIRED"),
+        bigquery.SchemaField("sk_periodo", "STRING", mode="REQUIRED"),
+        bigquery.SchemaField("sk_trabalhador", "STRING", mode="REQUIRED"),
+        bigquery.SchemaField("sk_movimentacao", "STRING", mode="REQUIRED"),
         bigquery.SchemaField("sk_localidade", "INTEGER", mode="REQUIRED"),
         bigquery.SchemaField("vl_salario", "FLOAT"),
         bigquery.SchemaField("nu_hora_contratual", "INTEGER"),
@@ -144,6 +145,10 @@ def table_exist(client,dataset_fonte):
             print("--------------------------------------------------------------------------")
 
     return table_movimentacao, table_localidade, table_trabalhador, table_periodo, table_empregador, table_fato_caged
+
+def check_data(client,table_localidade):
+    # Obtenha informações sobre a tabela
+    return client.get_table(table_localidade).num_rows > 0
 
 def update_date(client,credentials,dataset_fonte,table_periodo):
     ##########################################################################
@@ -186,13 +191,8 @@ def load_data(tables_dfs,client,dataset_fonte):
     for tabela, df in tables_dfs.items():
         table_ref = client.dataset(dataset_fonte.dataset_id).table(tabela.table_id)
         job_config = bigquery.LoadJobConfig()
-        job_config.write_disposition = bigquery.WriteDisposition.WRITE_TRUNCATE
+        job_config.write_disposition = bigquery.WriteDisposition.WRITE_APPEND
         job = client.load_table_from_dataframe(df, table_ref, job_config=job_config)
         job.result()
         print(f"Dados carregados na tabela {tabela}.")
-    
-    print("--------------------------------------------------------------------------")
-    print("##########################################################################")
-    print("#                       Fim da execução do programa                      #")
-    print("##########################################################################")
 

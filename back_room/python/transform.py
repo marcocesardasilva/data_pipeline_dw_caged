@@ -3,6 +3,20 @@ import pandas as pd
 import os
 
 
+def create_df_localidade(data_folder):
+    # Ler arquivo de dados
+    df_localidade = pd.read_csv(os.path.join(data_folder, 'MUNICIPIO.csv'), delimiter=';', encoding='ISO-8859-1')
+    # Renomear as colunas
+    df_localidade = df_localidade.rename(columns={
+        'nm_regiao': 'is_regiao','nm_uf': 'is_uf','cd_mun_ibge_6': 'sk_localidade','nm_municipio': 'is_municipio'
+        })
+    # Excluir colunas não usadas
+    df_localidade = df_localidade.drop(['cd_regiao','cd_uf','cd_mun_ibge_7'], axis=1)
+    # Corrigir a sequência
+    df_localidade = df_localidade.reindex(columns=['sk_localidade', 'is_regiao', 'is_uf','is_municipio'])
+    
+    return df_localidade
+
 def group_files(data_folder):
 
     current_directory = os.path.dirname(os.path.abspath(__file__))

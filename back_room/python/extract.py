@@ -20,12 +20,6 @@ def download_files(proximo_ano,proximo_mes,data_folder):
     # Verifica se o arquivo já foi baixado
     if(os.path.exists(f'{data_folder}/CAGEDMOV{ano_baixar}{mes_baixar}.txt')):
         print(f'Arquivo CAGEDMOV{ano_baixar}{mes_baixar} já foi baixado baixado')
-        # Atualiza próximo ano e mês à carregar
-        if proximo_mes < 12:
-            proximo_mes += 1
-        else:
-            proximo_mes = 1
-            proximo_ano += 1
 
     else:
     # Tenta baixar o primeiro arquivo
@@ -37,6 +31,7 @@ def download_files(proximo_ano,proximo_mes,data_folder):
             print('-------------------------------------------------')
             print('Todos os arquivos disponíveis foram baixados!')
             print('-------------------------------------------------')
+            return False
 
         # Verifica se o arquivo foi baixado
         if(os.path.exists(f'{data_folder}/CAGEDMOV{ano_baixar}{mes_baixar}.7z')):
@@ -52,14 +47,6 @@ def download_files(proximo_ano,proximo_mes,data_folder):
                 os.remove(f'{data_folder}/CAGEDMOV{ano_baixar}{mes_baixar}.7z')
             except OSError as e:
                 print(f"Error:{ e.strerror}")
-
-            # Atualiza próximo ano e mês à carregar
-            if proximo_mes < 12:
-                proximo_mes += 1
-            else:
-                proximo_mes = 1
-                proximo_ano += 1
-
 
     # Verifica se o arquivo foi baixado
     if(os.path.exists(f'{data_folder}/CAGEDFOR{ano_baixar}{mes_baixar}.txt')):
@@ -114,3 +101,4 @@ def download_files(proximo_ano,proximo_mes,data_folder):
             except OSError as e:
                 print(f"Error:{ e.strerror}")
 
+    return True

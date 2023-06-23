@@ -21,6 +21,13 @@ dataset_fonte = dataset_exist(client,dataset_name)
 table_movimentacao, table_localidade, table_trabalhador, table_periodo, table_empregador, table_fato_caged = table_exist(client,dataset_fonte)
 
 ##########################################################################
+#           Criar dimensão localidade, se ela ainda não existir          #
+##########################################################################
+if not check_data(client,table_localidade):
+    df_localidade = create_df_localidade(data_folder)
+    load_data({table_localidade:df_localidade},client,dataset_fonte)
+
+##########################################################################
 #                               Executar ETL                             #
 ##########################################################################
 while True:
@@ -31,7 +38,8 @@ while True:
     # Verificar próximo ano e mês a baixar dados
     proximo_ano, proximo_mes = update_date(client,credentials,dataset_fonte,table_periodo)
     # Baixar arquivos
-    download_files(proximo_ano,proximo_mes,data_folder)
+    if not download_files(proximo_ano,proximo_mes,data_folder):
+        break
 
     ##########################################################################
     #                         Executar transformações                        #
@@ -39,7 +47,7 @@ while True:
     # Ler todos os arquivos, tratar e agrupar em um único dataframe
     df_group = group_files(data_folder)
     # Criar dfs da fato e das dimensões
-    df_movimentacao, df_localidade, df_trabalhador, df_periodo, df_empregador, df_fato_caged = create_dfs(df_group)
+    df_movimentacao, df_trabalhador, df_periodo, df_empregador, df_fato_caged = create_dfs(df_group)
 
     ##########################################################################
     #                          Carregar dados no GCP                         #
@@ -47,11 +55,9 @@ while True:
     # Incluir tabelas e dfs em uma biblioteca
     tables_dfs = {
         table_movimentacao:df_movimentacao,
-        table_localidade:df_localidade,
         table_trabalhador:df_trabalhador,
         table_periodo:df_periodo,
         table_empregador:df_empregador,
         table_fato_caged:df_fato_caged}
     # Carregar os dados no GCP
     load_data(tables_dfs,client,dataset_fonte)
-
