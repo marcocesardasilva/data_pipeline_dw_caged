@@ -31,7 +31,7 @@ def dataset_exist(client,dataset_name):
     #                     Cria o dataset caso não exista                     #
     ##########################################################################
     print("--------------------------------------------------------------------------")
-    print("Verificando a existência do dataset no GCP...")
+    print(f"Verificando a existência do dataset {dataset_name} no GCP...")
     dataset_fonte = client.dataset(dataset_name)
     try:
         client.get_dataset(dataset_fonte)
@@ -118,7 +118,7 @@ def table_exist(client,dataset_fonte):
         bigquery.SchemaField("sk_movimentacao", "STRING", mode="REQUIRED"),
         bigquery.SchemaField("sk_localidade", "INTEGER", mode="REQUIRED"),
         bigquery.SchemaField("vl_salario", "FLOAT"),
-        bigquery.SchemaField("nu_hora_contratual", "INTEGER"),
+        bigquery.SchemaField("nu_hora_contratual", "FLOAT"),
         bigquery.SchemaField("nu_saldo", "INTEGER")
     ]
 
@@ -133,13 +133,15 @@ def table_exist(client,dataset_fonte):
 
     print("--------------------------------------------------------------------------")
     print("Verificando a existência das tabelas no GCP...")
+    print("--------------------------------------------------------------------------")
     for tabela, schema in tabelas.items():
         try:
             client.get_table(tabela, timeout=30)
             print(f"A tabela {tabela} já existe!")
             print("--------------------------------------------------------------------------")
         except:
-            print(f"Tabela {tabela} não encontrada! Criando tabela {tabela}...")
+            print(f"Tabela {tabela} não encontrada!")
+            print(f"Criando tabela {tabela}...")
             client.create_table(bigquery.Table(tabela, schema=schema))
             print(f"A tabela {tabela} foi criada.")
             print("--------------------------------------------------------------------------")
@@ -147,6 +149,8 @@ def table_exist(client,dataset_fonte):
     return table_movimentacao, table_localidade, table_trabalhador, table_periodo, table_empregador, table_fato_caged
 
 def check_data(client,table_localidade):
+    print("--------------------------------------------------------------------------")
+    print(f"Verificando a existência de dados na tabela {table_localidade} do GCP...")
     # Obtenha informações sobre a tabela
     return client.get_table(table_localidade).num_rows > 0
 
@@ -174,25 +178,60 @@ def update_date(client,credentials,dataset_fonte,table_periodo):
         results = query_job.result()
         # Iterar sobre os resultados
         for row in results:
-            proximo_mes = int(row["proximo_mes"])
-            proximo_ano = int(row["nu_ano"])
+            if int(row["proximo_mes"]) == 12:
+                proximo_mes == 1
+                proximo_ano = int(row["nu_ano"]) + 1
+            else:
+                proximo_mes = int(row["proximo_mes"]) + 1
+                proximo_ano = int(row["nu_ano"])
     else:
         proximo_mes = 1
         proximo_ano = 2020
-    print(f"Próximo mês e ano à carregar é: {proximo_mes} / {proximo_ano}")
     return proximo_ano, proximo_mes
 
 def load_data(tables_dfs,client,dataset_fonte):
     ##########################################################################
     #                         Carrega os dados no GCP                        #
     ##########################################################################
+    # print("--------------------------------------------------------------------------")
+    # print("Carregando dados no GCP...")
+    # for tabela, df in tables_dfs.items():
+    #     table_ref = client.dataset(dataset_fonte.dataset_id).table(tabela.table_id)
+    #     job_config = bigquery.LoadJobConfig()
+    #     job_config.write_disposition = bigquery.WriteDisposition.WRITE_APPEND
+    #     job = client.load_table_from_dataframe(df, table_ref, job_config=job_config)
+    #     job.result()
+    #     print(f"Dados carregados na tabela {tabela}.")
+
     print("--------------------------------------------------------------------------")
     print("Carregando dados no GCP...")
     for tabela, df in tables_dfs.items():
         table_ref = client.dataset(dataset_fonte.dataset_id).table(tabela.table_id)
+        table_name = tabela.table_id
         job_config = bigquery.LoadJobConfig()
         job_config.write_disposition = bigquery.WriteDisposition.WRITE_APPEND
-        job = client.load_table_from_dataframe(df, table_ref, job_config=job_config)
-        job.result()
-        print(f"Dados carregados na tabela {tabela}.")
+        
+        # Verificar se o nome da tabela começa com "dim_"
+        if table_name.startswith("dim_"):
+            # Verificar duplicatas com base na coluna que começa com "sk_"
+            existing_rows = client.list_rows(table_ref)
+            existing_df = existing_rows.to_dataframe()
+            existing_sk_values = existing_df[table_name.replace("dim_", "sk_")].tolist()
+            
+            # Filtrar novos dados removendo as duplicatas
+            new_df = df[~df[table_name.replace("dim_", "sk_")].isin(existing_sk_values)]
+            
+            if new_df.empty:
+                print(f"Não há novos dados para a tabela {table_name}.")
+                continue
+            
+            # Carregar novos dados sem duplicatas
+            job = client.load_table_from_dataframe(new_df, table_ref, job_config=job_config)
+            job.result()
+            print(f"Dados carregados na tabela {table_name}.")
+        else:
+            # Carregar dados diretamente sem verificar duplicatas
+            job = client.load_table_from_dataframe(df, table_ref, job_config=job_config)
+            job.result()
+            print(f"Dados carregados na tabela {table_name}.")
 

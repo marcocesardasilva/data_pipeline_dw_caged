@@ -1,9 +1,14 @@
 # importar bibliotecas
-import pandas as pd
 import os
+import pandas as pd
+import hashlib
+# importar de outros arquivos
+from constants import *
 
 
 def create_df_localidade(data_folder):
+    print("--------------------------------------------------------------------------")
+    print("Criando o dataframe df_localidade...")
     # Ler arquivo de dados
     df_localidade = pd.read_csv(os.path.join(data_folder, 'MUNICIPIO.csv'), delimiter=';', encoding='ISO-8859-1')
     # Renomear as colunas
@@ -14,63 +19,136 @@ def create_df_localidade(data_folder):
     df_localidade = df_localidade.drop(['cd_regiao','cd_uf','cd_mun_ibge_7'], axis=1)
     # Corrigir a sequência
     df_localidade = df_localidade.reindex(columns=['sk_localidade', 'is_regiao', 'is_uf','is_municipio'])
-    
+    print(f"Dataframe df_localidade criado com sucesso.")
+
     return df_localidade
 
 def group_files(data_folder):
 
-    current_directory = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_directory, data_folder)
     # lista para armazenar os dataframes de cada arquivo CSV
     dfs = []
 
     print("--------------------------------------------------------------------------")
-    print("Carregando os dados dos arquivos extraídos, tratando e concatenando...")
-    # percorre todos os arquivos da pasta com a extensão .csv
-    for arquivo in os.listdir(file_path):
-        if arquivo.endswith('.csv'):
-            # lê o arquivo CSV com o pandas
-            df = pd.read_csv(os.path.join(file_path, arquivo), delimiter=';', skiprows=5, header=5, encoding='ISO-8859-1')
-                    
-            # adiciona as colunas de indicador e equipe
-            df_colunas = pd.read_csv(os.path.join(file_path, arquivo), encoding='ISO-8859-1')
-            indicador = df_colunas.iloc[5,0] # valor da linha 7 do arquivo CSV
-            indicador = indicador.replace("Indicador: ", "")
-            equipe = df_colunas.iloc[7, 0] # valor da linha 9 do arquivo CSV
-            df['Indicador'] = indicador
-            df['Equipe'] = equipe
-            
-            # adiciona a coluna com o nome do arquivo
-            nome_arquivo = os.path.splitext(arquivo)[0] # remove a extensão do arquivo
-            df['Arquivo'] = nome_arquivo
+    print("--------------------------------------------------------------------------")
+    print("lendo os dados dos arquivos extraídos, tratando e concatenando...")
+    # Percorre todos os arquivos .txt na pasta
+    for filename in os.listdir(data_folder):
+        if filename.endswith('.txt'):
+            # lê o arquivo como CSV com o pandas
+            df = pd.read_csv(os.path.join(data_folder, filename), delimiter=';')
 
-            # Definir Ano
-            df['Ano'] = df.columns[5][:4]
+            # Verificar se o arquivo possui a coluna 'competênciaexc'
+            if 'competênciaexc' not in df.columns:
+                # Criar a coluna 'competênciaexc' com valor nulo
+                df['competênciaexc'] = None
 
-            # Renomear coluna de % de quartil
-            df = df.rename(columns={df.columns[5]: 'Percentual Quadrimestre'})
+            # Verificar se o arquivo possui a coluna 'indicadordeexclusão'
+            if 'indicadordeexclusão' not in df.columns:
+                # Criar a coluna 'indicadordeexclusão' com valor 0
+                df['indicadordeexclusão'] = 0
+                
+            # Criar a coluna data_mov
+            df['competênciamov'] = df['competênciamov'].astype(str) + '01'
+            df['data_mov'] = pd.to_datetime(df['competênciamov'], format='%Y%m%d')
 
-            # Definir Quadrimestre
-            df['Quadrimestre'] = df['Arquivo'].str[20]
-            
-            # Remover a coluna vazia
-            df = df.drop('Unnamed: 12', axis=1)
-            df = df.drop('Arquivo', axis=1)
+            # criar colunas nu_ano e nu_mes
+            df['nu_ano'] = df['data_mov'].dt.year
+            df['nu_mes'] = df['data_mov'].dt.month
 
-            # Remover as 5 últimas linas de rosto
-            df = df.drop(df.tail(5).index)
+            # Alterar tipo de dados
+            df['idade'] = df['idade'].fillna(0).astype(int)
+            df['salário'] = df['salário'].str.replace(',', '.').fillna(0).astype(float)
+            df['horascontratuais'] = df['horascontratuais'].str.replace(',', '.').fillna(0).astype(float)
 
-            # adiciona o dataframe à lista de dataframes
+            # Realizar de-para
+            df['graudeinstrução'] = df['graudeinstrução'].astype(str).apply(lambda x: map_grau_instrucao.get(x, "Não Identificado"))
+            df['sexo'] = df['sexo'].astype(str).apply(lambda x: map_genero.get(x, "Não Identificado"))
+            df['raçacor'] = df['raçacor'].astype(str).apply(lambda x: map_etnia.get(x, "Não Identificado"))
+            df['tipodedeficiência'] = df['tipodedeficiência'].astype(str).apply(lambda x: map_tp_deficiencia.get(x, "Não Identificado"))
+            df['tipoempregador'] = df['tipoempregador'].astype(str).apply(lambda x: map_tp_empregador.get(x, "Não Identificado"))
+            df['tipoestabelecimento'] = df['tipoestabelecimento'].astype(str).apply(lambda x: map_tp_estabelecimento[x])
+            df['seção'] = df['seção'].astype(str).apply(lambda x: map_secao_economica.get(x, "Não Identificado"))
+            df['subclasse'] = df['subclasse'].astype(str).apply(lambda x: map_subclasse_econ.get(x, "Não Identificado"))
+            df['tamestabjan'] = df['tamestabjan'].astype(str).apply(lambda x: map_faixa_tam_estab.get(x, "Não Informado"))
+            df['tipomovimentação'] = df['tipomovimentação'].astype(str).apply(lambda x: map_tp_movimentacao.get(x, "Não Identificado"))
+            df['categoria'] = df['categoria'].astype(str).apply(lambda x: map_categoria.get(x, "Não Identificado"))
+            df['cbo2002ocupação'] = df['cbo2002ocupação'].astype(str).apply(lambda x: map_cbo_ocupacao.get(x, "Não Identificado"))
+            df['indtrabintermitente'] = df['indtrabintermitente'].astype(str).apply(lambda x: map_sim_nao.get(x, "Não Identificado"))
+            df['indtrabparcial'] = df['indtrabparcial'].astype(str).apply(lambda x: map_sim_nao.get(x, "Não Identificado"))
+            df['indicadoraprendiz'] = df['indicadoraprendiz'].astype(str).apply(lambda x: map_sim_nao.get(x, "Não Identificado"))
+            df['indicadordeexclusão'] = df['indicadordeexclusão'].astype(str).apply(lambda x: map_sim_nao.get(x, "Não Identificado"))
+            df['indicadordeforadoprazo'] = df['indicadordeforadoprazo'].astype(str).apply(lambda x: map_sim_nao.get(x, "Não Identificado"))
+
+            # Concatenar as colunas do DataFrame
+            concatenacao_trabalhador = df['graudeinstrução'] + df['sexo'] + df['idade'].astype(str) + df['raçacor'] + df['tipodedeficiência']
+            # Calcular o hash para a concatenação das colunas
+            hashes_trabalhador = concatenacao_trabalhador.apply(lambda x: hashlib.md5(x.encode()).hexdigest())
+            # Adicionar a coluna 'hash' ao DataFrame
+            df['sk_trabalhador'] = hashes_trabalhador
+
+            # Concatenar as colunas do DataFrame
+            concatenacao_empregador = df['tipoempregador'] + df['tipoestabelecimento'] + df['seção'] + df['subclasse'] + df['tamestabjan']
+            # Calcular o hash para a concatenação das colunas
+            hashes_empregador = concatenacao_empregador.apply(lambda x: hashlib.md5(x.encode()).hexdigest())
+            # Adicionar a coluna 'hash' ao DataFrame
+            df['sk_empregador'] = hashes_empregador
+
+            # Concatenar as colunas do DataFrame
+            concatenacao_movimentacao = df['tipomovimentação'] + df['categoria'] + df['cbo2002ocupação'] + df['indtrabintermitente'] + df['indtrabparcial'] + df['indicadoraprendiz'] + df['indicadordeexclusão'] + df['indicadordeforadoprazo']
+            # Calcular o hash para a concatenação das colunas
+            hashes_movimentacao = concatenacao_movimentacao.apply(lambda x: hashlib.md5(x.encode()).hexdigest())
+            # Adicionar a coluna 'hash' ao DataFrame
+            df['sk_movimentacao'] = hashes_movimentacao
+
+            # Renomar colunas
+            df = df.rename(columns={
+                'competênciamov': 'sk_periodo',
+                'município': 'sk_localidade',
+                'idade': 'nu_idade',
+                'seção': 'is_secao_econ',
+                'subclasse': 'is_subclasse_econ',
+                'saldomovimentação':'nu_saldo',
+                'cbo2002ocupação':'is_cbo_ocupacao',
+                'categoria':'is_categoria',
+                'graudeinstrução':'is_grau_instrucao',
+                'horascontratuais':'nu_hora_contratual',
+                'raçacor':'is_etnia',
+                'sexo':'is_genero',
+                'tipoempregador':'is_tp_empregador',
+                'tipoestabelecimento':'is_tp_estabelecimento',
+                'tipomovimentação':'is_tp_movimentacao',
+                'tipodedeficiência':'is_tp_deficiencia',
+                'indtrabintermitente':'is_fl_intermitente',
+                'indtrabparcial':'is_fl_trab_parcial',
+                'salário':'vl_salario',
+                'tamestabjan':'is_faixa_tam_estab',
+                'indicadoraprendiz':'is_fl_aprendiz',
+                'indicadordeexclusão':'is_fl_exclusao',
+                'indicadordeforadoprazo':'is_fl_fora_prazo'
+                })
+
+            # Excluir coluna não usadas
+            df = df.drop([
+                'unidadesaláriocódigo',
+                'valorsaláriofixo',
+                'região',
+                'uf',
+                'origemdainformação',
+                'competênciadec',
+                'competênciaexc'
+                ], axis=1)
+
+            # Adiciona o dataframe à lista de dataframes
             dfs.append(df)
-    
+
+            try:
+                os.remove(f'{data_folder}/{filename}')
+            except OSError as e:
+                print(f"Error:{ e.strerror}")
+
     # concatena os dataframes em um único dataframe final
     df_group = pd.concat(dfs, ignore_index=True)
 
-    # Incluir sks
-    df_group['sk_indicador'] = df_group['Indicador'].map(df_group['Indicador'].drop_duplicates().reset_index(drop=True).reset_index().set_index('Indicador')['index'] + 1)
-    df_group['sk_equipe'] = pd.factorize(df_group['Equipe'])[0] + 1
-    df_group['sk_localidade'] = df_group['IBGE'].astype(int)
-    df_group["sk_periodo"] = df_group["Ano"]+df_group["Quadrimestre"]
     print("Dataframe único criado com todos os dados.")
     print("--------------------------------------------------------------------------")
 
@@ -80,86 +158,47 @@ def create_dfs(df_group):
     print("--------------------------------------------------------------------------")
     print("Criando dataframes para geração de modelo dimensional star schema...")
 
-    # mapeamento dos valores de de_indicador para nm_indicador
-    map_indicador = {'Proporção de crianças de 1 (um) ano de idade vacinadas na APS contra Difteria, Tétano, Coqueluche, Hepatite B, infecções causadas por haemophilus influenzae tipo b e Poliomielite inativada': 'Crianças vacinadas',
-                    'Proporção de gestantes com pelo menos 6 (seis) consultas pré-natal realizadas, sendo a 1ª (primeira) até a 12ª (décima segunda) semana de gestação': 'Gestantes pré-natal',
-                    'Proporção de gestantes com atendimento odontológico realizado': 'Gestantes odontológico',
-                    'Proporção de gestantes com realização de exames para sífilis e HIV': 'Gestantes exames DSTs',
-                    'Proporção de mulheres com coleta de citopatológico na APS': 'Mulheres citopatológico',
-                    'Proporção de pessoas com diabetes, com consulta e hemoglobina glicada solicitada no semestre': 'Pessoas diabetes',
-                    'Proporção de pessoas com hipertensão, com consulta e pressão arterial aferida no semestre': 'Pessoas hipertensão'}
+    # Criar df_movimentacao
+    df_movimentacao =  df_group[[
+        'sk_movimentacao','is_tp_movimentacao','is_categoria','is_cbo_ocupacao','is_fl_intermitente',
+        'is_fl_trab_parcial','is_fl_aprendiz','is_fl_exclusao','is_fl_fora_prazo'
+        ]].drop_duplicates().reset_index(drop=True)
+    df_movimentacao.name = 'df_movimentacao'
+    print(f"Dataframe {df_movimentacao.name} criado.")
 
-    # Criar df_indicador
-    df_indicador =  df_group[['sk_indicador','Indicador']].drop_duplicates().reset_index(drop=True)
-    df_indicador = df_indicador.rename(columns={'Indicador': 'de_indicador'})
-    df_indicador['nm_indicador'] = df_indicador['de_indicador'].apply(lambda x: map_indicador[x])
-    df_indicador = df_indicador.reindex(columns=['sk_indicador', 'nm_indicador', 'de_indicador'])
-    df_indicador.name = 'df_indicador'
-    print(f"Dataframe {df_indicador.name} criado.")
-
-    # mapeamento dos valores de de_indicador para nm_indicador
-    map_equipe = {'Considerado apenas (eSF e eAP) válidas para o componente de desempenho': 'Válidas',
-                'Considerado apenas equipes (eSF e eAP) homologadas': 'Homologadas'}
-
-    # Criar df_equipe
-    df_equipe =  df_group[['sk_equipe','Equipe']].drop_duplicates().reset_index(drop=True)
-    df_equipe = df_equipe.rename(columns={'Equipe': 'de_equipe'})
-    df_equipe['nm_equipe'] = df_equipe['de_equipe'].apply(lambda x: map_equipe[x])
-    df_equipe = df_equipe.reindex(columns=['sk_equipe', 'nm_equipe', 'de_equipe'])
-    df_equipe.name = 'df_equipe'
-    print(f"Dataframe {df_equipe.name} criado.")
-
-    # Criar df_localidade
-    df_localidade = df_group[['sk_localidade', 'UF', 'Munícipio']].drop_duplicates().reset_index(drop=True)
-    df_localidade = df_localidade.rename(columns={'UF': 'uf', 'Munícipio': 'municipio'})
-    df_localidade.name = 'df_localidade'
-    print(f"Dataframe {df_localidade.name} criado.")
+    # Criar df_trabalhador
+    df_trabalhador =  df_group[[
+        'sk_trabalhador','is_grau_instrucao','is_genero','nu_idade','is_etnia','is_tp_deficiencia'
+        ]].drop_duplicates().reset_index(drop=True)
+    df_trabalhador.name = 'df_trabalhador'
+    print(f"Dataframe {df_trabalhador.name} criado.")
 
     # Criar df_periodo
-    df_periodo = df_group[['sk_periodo','Ano','Quadrimestre']].drop_duplicates().reset_index(drop=True)
-    df_periodo = df_periodo.rename(columns={'Ano': 'ano', 'Quadrimestre': 'quadrimestre'})
-    df_periodo = df_periodo.reindex(columns=['sk_periodo', 'ano', 'quadrimestre'])
+    df_periodo = df_group[['sk_periodo','data_mov','nu_ano','nu_mes']].drop_duplicates().reset_index(drop=True)
     df_periodo.name = 'df_periodo'
     print(f"Dataframe {df_periodo.name} criado.")
 
-    # Criar fato_sisab
-    fato_sisab = df_group[[
-        'sk_indicador',
-        'sk_equipe',
+    # Criar df_empregador
+    df_empregador =  df_group[[
+        'sk_empregador','is_tp_empregador','is_tp_estabelecimento','is_secao_econ','is_subclasse_econ','is_faixa_tam_estab'
+        ]].drop_duplicates().reset_index(drop=True)
+    df_empregador.name = 'df_empregador'
+    print(f"Dataframe {df_empregador.name} criado.")
+
+    # Criar df_fato_caged
+    df_fato_caged = df_group[[
+        'sk_empregador',
         'sk_periodo',
+        'sk_trabalhador',
+        'sk_movimentacao',
         'sk_localidade',
-        'Numerador',
-        'Denominador Utilizado',
-        'Percentual Quadrimestre',
-        'Denominador Identificado',
-        'Denominador Estimado',
-        'Cadastro',
-        'Base Externa',
-        'Percentual',
-        'População'
+        'vl_salario',
+        'nu_hora_contratual',
+        'nu_saldo'
         ]]
-    fato_sisab = fato_sisab.rename(columns={
-        'Numerador': 'numerador',
-        'Denominador Utilizado': 'denominador_utilizado',
-        'Percentual Quadrimestre': 'percentual_quadrimestre',
-        'Denominador Identificado': 'denominador_identificado',
-        'Denominador Estimado': 'denominador_estimado',
-        'Cadastro': 'cadastro',
-        'Base Externa': 'base_externa',
-        'Percentual': 'percentual',
-        'População': 'populacao'
-        })
-    fato_sisab['numerador'] = fato_sisab['numerador'].astype(int)
-    fato_sisab['denominador_utilizado'] = fato_sisab['denominador_utilizado'].astype(int)
-    fato_sisab['percentual_quadrimestre'] = fato_sisab['percentual_quadrimestre'].astype(int)
-    fato_sisab['denominador_identificado'] = fato_sisab['denominador_identificado'].astype(int)
-    fato_sisab['denominador_estimado'] = fato_sisab['denominador_estimado'].astype(int)
-    fato_sisab['cadastro'] = fato_sisab['cadastro'].astype(int)
-    fato_sisab['percentual'] = fato_sisab['percentual'].astype(int)
-    fato_sisab['populacao'] = fato_sisab['populacao'].astype(int)
-    fato_sisab.name = 'fato_sisab'
-    print(f"Dataframe {fato_sisab.name} criado.")
+    df_fato_caged.name = 'df_fato_caged'
+    print(f"Dataframe {df_fato_caged.name} criado.")
     print("--------------------------------------------------------------------------")
 
-    return df_indicador, df_equipe, df_localidade, df_periodo, fato_sisab
+    return df_movimentacao, df_trabalhador, df_periodo, df_empregador, df_fato_caged
 

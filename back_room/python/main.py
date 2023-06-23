@@ -2,6 +2,8 @@
 from extract import *
 from transform import *
 from load import *
+# importando bibliotecas
+import time
 
 ##########################################################################
 #                            Definir variáveis                           #
@@ -9,6 +11,8 @@ from load import *
 file_key = "keys\dw-caged-e843b4e16870.json"
 dataset_name = "caged"
 data_folder = "dados"
+# Registrar o tempo no início da execução
+start_time = time.time()
 
 ##########################################################################
 #               Criar conexão com o GCP, dataset e tabelas               #
@@ -26,6 +30,9 @@ table_movimentacao, table_localidade, table_trabalhador, table_periodo, table_em
 if not check_data(client,table_localidade):
     df_localidade = create_df_localidade(data_folder)
     load_data({table_localidade:df_localidade},client,dataset_fonte)
+else:
+    print("--------------------------------------------------------------------------")
+    print("Dados da tabela dw-caged.caged.dim_localidade já carregados no GCP.")
 
 ##########################################################################
 #                               Executar ETL                             #
@@ -40,7 +47,7 @@ while True:
     # Baixar arquivos
     if not download_files(proximo_ano,proximo_mes,data_folder):
         break
-
+        
     ##########################################################################
     #                         Executar transformações                        #
     ##########################################################################
@@ -61,3 +68,21 @@ while True:
         table_fato_caged:df_fato_caged}
     # Carregar os dados no GCP
     load_data(tables_dfs,client,dataset_fonte)
+
+##########################################################################
+#                       Calculando tempo de execução                     #
+##########################################################################
+# Registrar o tempo no final da execução
+end_time = time.time()
+# Calcular o tempo total de execução
+total_time = end_time - start_time
+
+print("--------------------------------------------------------------------------")
+print("##########################################################################")
+print("#                       Fim da execução do programa                      #")
+print("##########################################################################")
+
+# Exibir o tempo total de execução
+print("--------------------------------------------------------------------------")
+print(f"Tempo total de execução: {total_time} segundos.")
+print("--------------------------------------------------------------------------")
