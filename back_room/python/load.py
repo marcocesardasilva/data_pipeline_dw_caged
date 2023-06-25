@@ -193,16 +193,6 @@ def load_data(tables_dfs,client,dataset_fonte):
     ##########################################################################
     #                         Carrega os dados no GCP                        #
     ##########################################################################
-    # print("--------------------------------------------------------------------------")
-    # print("Carregando dados no GCP...")
-    # for tabela, df in tables_dfs.items():
-    #     table_ref = client.dataset(dataset_fonte.dataset_id).table(tabela.table_id)
-    #     job_config = bigquery.LoadJobConfig()
-    #     job_config.write_disposition = bigquery.WriteDisposition.WRITE_APPEND
-    #     job = client.load_table_from_dataframe(df, table_ref, job_config=job_config)
-    #     job.result()
-    #     print(f"Dados carregados na tabela {tabela}.")
-
     print("--------------------------------------------------------------------------")
     print("Carregando dados no GCP...")
     for tabela, df in tables_dfs.items():
